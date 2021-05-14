@@ -1,0 +1,52 @@
+openapi: 3.0.1
+info:
+  title: MintNote API
+  version: v0.0.1
+paths:
+  /notes/:
+    get:
+      tags:
+        - Notes
+      description: Get all notes
+      operationId: getNotes
+      responses:
+        200:
+          description: Notes were successfuly retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+components:
+  schemas:
+    Note:
+      type: object
+      properties:
+        name:
+          type: string
+        icon:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        creationDate:
+          type: string
+          format: date-time
+        lastModifiedDate:
+          type: string
+          format: date-time
+        parent:
+          type: string
+        id:
+          type: string
+        content:
+          type: string
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+        color:
+          type: string
