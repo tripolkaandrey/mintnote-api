@@ -18,6 +18,31 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+  /notes/{id}/:
+    get:
+      tags:
+        - Notes
+      description: Get note by id
+      operationId: getNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Note:
