@@ -184,4 +184,24 @@ class NotesControllerTests {
                     Assertions.assertNotNull(responseNote.getId());
                 });
     }
+
+    @Test
+    void delete_ExistingId_Ok() {
+        Note note = noteRepository.save(new Note()).block();
+
+        webTestClient.delete().uri("/notes/" + note.getId() + "/")
+                .exchange()
+                .expectStatus().isOk();
+
+        Assertions.assertNull(noteRepository.findById(note.getId()).block());
+    }
+
+    @Test
+    void delete_NotExistingId_NotFound() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+        webTestClient.delete().uri("/notes/" + randomString)
+                .exchange()
+                .expectStatus().isNotFound();
+    }
 }
