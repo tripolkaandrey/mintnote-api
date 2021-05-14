@@ -1,0 +1,18 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    name: Deploy to App Engine
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Deploy to App Engine
+        uses: google-github-actions/deploy-appengine@v0.3.1
+        with:
+          deliverables: pom.xml
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials: ${{ secrets.GCP_CD_SA_KEY }}
