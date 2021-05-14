@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -95,5 +96,12 @@ public final class NotesController {
                         }
                 ).map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<Note>> createNote(@RequestBody Note note) {
+        return noteRepository.save(note)
+                .map(body -> ResponseEntity.created(URI.create("/notes/" + body.getId())).body(body))
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
     }
 }
