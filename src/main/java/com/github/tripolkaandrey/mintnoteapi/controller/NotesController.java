@@ -18,9 +18,11 @@ import java.util.List;
 @RequestMapping("/notes/")
 public final class NotesController {
     private final NoteRepository noteRepository;
+    private final TranslationService translationService;
 
-    public NotesController(NoteRepository noteRepository) {
+    public NotesController(NoteRepository noteRepository, TranslationService translationService) {
         this.noteRepository = noteRepository;
+        this.translationService = translationService;
     }
 
     @GetMapping
@@ -113,5 +115,18 @@ public final class NotesController {
                 .flatMap(n -> noteRepository.deleteById(id).then(Mono.just(ResponseEntity.ok().<Void>build())))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
 
+    }
+
+    @GetMapping("translate/{id}/{targetLanguage}/")
+    public Mono<ResponseEntity<String>> translate(@PathVariable String id, @PathVariable String targetLanguage) {
+        return noteRepository.findById(id)
+                .map(n -> {
+                    try {
+                        String translatedContent = translationService.translate(n.getContent(), targetLanguage);
+                        return ResponseEntity.ok(translatedContent);
+                    } catch (IOException e) {
+                        return ResponseEntity.badRequest().<String>build();
+                    }
+                }).defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }
