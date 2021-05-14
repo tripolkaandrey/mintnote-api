@@ -18,6 +18,30 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+    post:
+      tags:
+        - Notes
+      description: Create note
+      operationId: createNote
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+        required: true
+      responses:
+        201:
+          description: Note was successfuly created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Note'
+        400:
+          description: Note was not created due to invalid params
+          content:
+            text/plain:
+              schema:
+                type: string
   /notes/{id}/:
     get:
       tags:
