@@ -169,4 +169,19 @@ class NotesControllerTests {
                 .exchange()
                 .expectStatus().isNotFound();
     }
+
+    @Test
+    void createNote_Created() {
+        Note testNote = new Note();
+
+        webTestClient.post().uri("/notes/")
+                .body(Mono.just(testNote), Note.class)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(Note.class)
+                .consumeWith(response -> {
+                    Note responseNote = response.getResponseBody();
+                    Assertions.assertNotNull(responseNote.getId());
+                });
+    }
 }
