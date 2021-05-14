@@ -2,7 +2,9 @@ package com.github.tripolkaandrey.mintnoteapi.controller;
 
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.repository.NoteRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -34,5 +36,28 @@ class NotesControllerTests {
                 .expectStatus().isOk()
                 .expectBodyList(Note.class)
                 .hasSize(amountOfNotes);
+    }
+
+    @Test
+    void getNote_ExistingId_Ok() {
+        Note testNote = noteRepository.save(new Note()).block();
+
+        webTestClient.get().uri("/notes/" + testNote.getId() + "/")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Note.class)
+                .consumeWith(response -> {
+                    Note responseNote = response.getResponseBody();
+                    Assertions.assertEquals(testNote.getId(), responseNote.getId());
+                });
+    }
+
+    @Test
+    void getNote_NotExistingId_NotFound() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+        webTestClient.get().uri("/notes/" + randomString)
+                .exchange()
+                .expectStatus().isNotFound();
     }
 }
