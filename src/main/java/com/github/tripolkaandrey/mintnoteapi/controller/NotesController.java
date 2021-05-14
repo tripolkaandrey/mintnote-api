@@ -3,11 +3,13 @@ package com.github.tripolkaandrey.mintnoteapi.controller;
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.entity.Tag;
 import com.github.tripolkaandrey.mintnoteapi.repository.NoteRepository;
+import com.github.tripolkaandrey.mintnoteapi.service.TranslationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -103,5 +105,13 @@ public final class NotesController {
         return noteRepository.save(note)
                 .map(body -> ResponseEntity.created(URI.create("/notes/" + body.getId())).body(body))
                 .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @DeleteMapping("{id}/")
+    public Mono<ResponseEntity<Void>> deleteNote(@PathVariable String id) {
+        return noteRepository.findById(id)
+                .flatMap(n -> noteRepository.deleteById(id).then(Mono.just(ResponseEntity.ok().<Void>build())))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+
     }
 }
