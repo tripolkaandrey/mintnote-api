@@ -67,6 +67,30 @@ paths:
             text/plain:
               schema:
                 type: string
+    delete:
+      tags:
+        - Notes
+      description: Delete note by id
+      operationId: deleteNote
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Note was successfuly deleted
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
   /notes/{id}/name/:
     put:
       tags:
