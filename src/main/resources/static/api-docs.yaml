@@ -43,6 +43,158 @@ paths:
             text/plain:
               schema:
                 type: string
+  /notes/{id}/name/:
+    put:
+      tags:
+        - Notes
+      description: Update note's name
+      operationId: updateName
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: Note's name was successfuly updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        "404":
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /notes/{id}/tags/:
+    put:
+      tags:
+        - Notes
+      description: Update note's name
+      operationId: updateTags
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Tag'
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Note's tags were successfuly updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /notes/{id}/icon/:
+    put:
+      tags:
+        - Notes
+      description: Update note's icon
+      operationId: updateIcon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Note's icon was successfuly updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /notes/{id}/parent/:
+    put:
+      tags:
+        - Notes
+      description: Update note's parent
+      operationId: updateParent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Note's parent was successfuly updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
+  /notes/{id}/content/:
+    put:
+      tags:
+        - Notes
+      description: Update note's content
+      operationId: updateContent
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        200:
+          description: Note's content was successfuly updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Note:
