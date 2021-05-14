@@ -243,6 +243,43 @@ paths:
             text/plain:
               schema:
                 type: string
+  /notes/translate/{id}/{targetLanguage}/:
+    get:
+      tags:
+        - Notes
+      description: Translate note to target language
+      operationId: translate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: targetLanguage
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Language code supported by Google Translate API
+      responses:
+        200:
+          description: Note was successfuly translated
+          content:
+            text/plain:
+              schema:
+                type: string
+        400:
+          description: Error occured while translating note
+          content:
+            text/plain:
+              schema:
+                type: string
+        404:
+          description: Note with provided id was not found
+          content:
+            text/plain:
+              schema:
+                type: string
 components:
   schemas:
     Note:
