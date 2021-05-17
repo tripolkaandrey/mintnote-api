@@ -25,4 +25,4 @@ jobs:
           firebase emulators:start --only=firestore --project=${{ secrets.GCP_PROJECT_ID }} &
 
       - name: Run tests
-        run: mvn test
+        run: mvn test -q
