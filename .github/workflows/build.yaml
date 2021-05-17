@@ -18,11 +18,8 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Enable Firestore Emulator
-        run: >
-          curl -sL https://firebase.tools | bash &&
-          firebase setup:emulators:firestore &&
-          firebase emulators:start --only=firestore --project=${{ secrets.GCP_PROJECT_ID }} &
+      - name: Enable Firestore emulator
+        run: docker run -p 9000:9000  --rm --volume "$PWD/firebase_configs:/firebase" spine3/firebase-emulator &
 
       - name: Run tests
         run: mvn test -q
