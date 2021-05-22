@@ -64,9 +64,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
     delete:
       tags:
         - Notes
@@ -88,9 +88,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/name/:
     put:
       tags:
@@ -118,9 +118,9 @@ paths:
         "404":
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/tags/:
     put:
       tags:
@@ -150,9 +150,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/icon/:
     put:
       tags:
@@ -180,9 +180,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/parent/:
     put:
       tags:
@@ -210,9 +210,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/content/:
     put:
       tags:
@@ -240,9 +240,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
   /notes/translate/{id}/{targetLanguage}/:
     get:
       tags:
@@ -277,9 +277,9 @@ paths:
         404:
           description: Note with provided id was not found
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ApiError'
 components:
   schemas:
     Note:
@@ -311,4 +311,11 @@ components:
         name:
           type: string
         color:
+          type: string
+    ApiError:
+      type: object
+      properties:
+        status:
+          type: string
+        message:
           type: string
