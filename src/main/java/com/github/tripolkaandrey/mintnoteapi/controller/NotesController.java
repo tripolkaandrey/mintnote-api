@@ -117,7 +117,7 @@ public final class NotesController {
 
     }
 
-    @GetMapping("translate/{id}/{targetLanguage}/")
+    @GetMapping("{id}/translation/{targetLanguage}/")
     public Mono<ResponseEntity<String>> translate(@PathVariable String id, @PathVariable String targetLanguage) {
         return noteRepository.findById(id)
                 .flatMap(note -> translationService.translate(note.getContent(), targetLanguage))
