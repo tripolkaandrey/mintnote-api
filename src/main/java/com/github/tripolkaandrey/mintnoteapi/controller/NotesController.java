@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -121,13 +120,8 @@ public final class NotesController {
     @GetMapping("translate/{id}/{targetLanguage}/")
     public Mono<ResponseEntity<String>> translate(@PathVariable String id, @PathVariable String targetLanguage) {
         return noteRepository.findById(id)
-                .map(n -> {
-                    try {
-                        String translatedContent = translationService.translate(n.getContent(), targetLanguage);
-                        return ResponseEntity.ok(translatedContent);
-                    } catch (IOException e) {
-                        return ResponseEntity.badRequest().<String>build();
-                    }
-                }).defaultIfEmpty(ResponseEntity.notFound().build());
+                .flatMap(note -> translationService.translate(note.getContent(), targetLanguage))
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

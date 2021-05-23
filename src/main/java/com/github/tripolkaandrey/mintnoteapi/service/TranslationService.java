@@ -1,11 +1,15 @@
 package com.github.tripolkaandrey.mintnoteapi.service;
 
+import com.github.tripolkaandrey.mintnoteapi.exception.TranslationServiceInternalError;
+import com.github.tripolkaandrey.mintnoteapi.exception.TranslationServiceInvalidArgumentException;
 import com.google.api.gax.core.FixedCredentialsProvider;
+import com.google.api.gax.rpc.InvalidArgumentException;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.spring.core.GcpProjectIdProvider;
 import com.google.cloud.translate.v3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,9 +29,7 @@ public final class TranslationService {
                                         GoogleCredentials.fromStream(new ByteArrayInputStream(serviceAccount.getBytes())))).build();
     }
 
-    public String translate(String text, String targetLanguage) throws IOException {
-        var result = new StringBuilder();
-
+    public Mono<String> translate(String text, String targetLanguage) {
         try (var client = TranslationServiceClient.create(translationServiceSettings)) {
             var parent = LocationName.of(gcpProjectIdProvider.getProjectId(), "global");
 
@@ -39,13 +41,16 @@ public final class TranslationService {
                             .addContents(text)
                             .build();
 
-            TranslateTextResponse response = client.translateText(request);
-
-            for (Translation translation : response.getTranslationsList()) {
-                result.append(translation.getTranslatedText());
-            }
-
-            return result.toString();
+            return Mono.just(client.translateText(request))
+                    .flatMapIterable(TranslateTextResponse::getTranslationsList).collect(
+                            StringBuilder::new,
+                            (StringBuilder collector, Translation translation) -> collector.append(translation.getTranslatedText()))
+                    .map(StringBuilder::toString);
+        } catch (InvalidArgumentException ex) {
+            return Mono.error(new TranslationServiceInvalidArgumentException());
+        } catch (IOException ex) {
+            //problem occurred with translation. Most probably referred to credentials
+            return Mono.error(new TranslationServiceInternalError());
         }
     }
 }
