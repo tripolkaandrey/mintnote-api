@@ -18,8 +18,15 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_CI_SA_KEY }}
+          export_default_credentials: true
+
       - name: Enable Firestore emulator
         run: docker run -p 9000:9000  --rm --volume "$PWD/firebase_configs:/firebase" spine3/firebase-emulator &
 
       - name: Run tests
-        run: mvn test -q
+        run: mvn test
