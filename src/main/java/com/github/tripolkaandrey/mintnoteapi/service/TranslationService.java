@@ -42,7 +42,8 @@ public final class TranslationService {
                             .build();
 
             return Mono.just(client.translateText(request))
-                    .flatMapIterable(TranslateTextResponse::getTranslationsList).collect(
+                    .flatMapIterable(TranslateTextResponse::getTranslationsList)
+                    .collect(
                             StringBuilder::new,
                             (StringBuilder collector, Translation translation) -> collector.append(translation.getTranslatedText()))
                     .map(StringBuilder::toString);
