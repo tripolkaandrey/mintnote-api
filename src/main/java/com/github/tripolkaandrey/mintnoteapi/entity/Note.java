@@ -24,4 +24,23 @@ public final class Note extends FileSystemUnit {
     public void setContent(String content) {
         this.content = content;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Note note = (Note) o;
+
+        return id.equals(note.id) && content.equals(note.content);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + id.hashCode();
+        result = 31 * result + content.hashCode();
+        return result;
+    }
 }
