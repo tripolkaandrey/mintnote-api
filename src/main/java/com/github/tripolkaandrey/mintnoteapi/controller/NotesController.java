@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 @RestController
 @RequestMapping("/notes/")
@@ -39,62 +40,34 @@ public final class NotesController {
 
     @PutMapping("{id}/name/")
     public Mono<ResponseEntity<Note>> updateName(@PathVariable String id, @RequestBody String name) {
-        return noteRepository.findById(id)
-                .flatMap(
-                        n -> {
-                            n.setName(name);
-                            n.setLastModifiedDate(new Date());
-                            return noteRepository.save(n);
-                        }
-                ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
+        return updateNote(id, note -> note.setName(name));
     }
 
     @PutMapping("{id}/tags/")
     public Mono<ResponseEntity<Note>> updateTags(@PathVariable String id, @RequestBody List<Tag> tags) {
-        return noteRepository.findById(id)
-                .flatMap(
-                        n -> {
-                            n.setTags(tags);
-                            n.setLastModifiedDate(new Date());
-                            return noteRepository.save(n);
-                        }
-                ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
+        return updateNote(id, note -> note.setTags(tags));
     }
 
     @PutMapping("{id}/icon/")
     public Mono<ResponseEntity<Note>> updateIcon(@PathVariable String id, @RequestBody String icon) {
-        return noteRepository.findById(id)
-                .flatMap(
-                        n -> {
-                            n.setIcon(icon);
-                            n.setLastModifiedDate(new Date());
-                            return noteRepository.save(n);
-                        }
-                ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
+        return updateNote(id, note -> note.setIcon(icon));
     }
 
     @PutMapping("{id}/parent/")
     public Mono<ResponseEntity<Note>> updateParent(@PathVariable String id, @RequestBody String parent) {
-        return noteRepository.findById(id)
-                .flatMap(
-                        n -> {
-                            n.setParent(parent);
-                            n.setLastModifiedDate(new Date());
-                            return noteRepository.save(n);
-                        }
-                ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
+        return updateNote(id, note -> note.setParent(parent));
     }
 
     @PutMapping("{id}/content/")
     public Mono<ResponseEntity<Note>> updateContent(@PathVariable String id, @RequestBody String content) {
+        return updateNote(id, note -> note.setContent(content));
+    }
+
+    private Mono<ResponseEntity<Note>> updateNote(String id, Consumer<Note> updater) {
         return noteRepository.findById(id)
                 .flatMap(
                         n -> {
-                            n.setContent(content);
+                            updater.accept(n);
                             n.setLastModifiedDate(new Date());
                             return noteRepository.save(n);
                         }
