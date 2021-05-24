@@ -8,6 +8,7 @@ public final class Note extends FileSystemUnit {
     @DocumentId
     private String id;
     private String content;
+    private String userId;
 
     public String getId() {
         return id;
@@ -25,6 +26,14 @@ public final class Note extends FileSystemUnit {
         this.content = content;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -33,7 +42,9 @@ public final class Note extends FileSystemUnit {
 
         Note note = (Note) o;
 
-        return id.equals(note.id) && content.equals(note.content);
+        return id.equals(note.id) &&
+                content.equals(note.content) &&
+                userId.equals(note.userId);
     }
 
     @Override
