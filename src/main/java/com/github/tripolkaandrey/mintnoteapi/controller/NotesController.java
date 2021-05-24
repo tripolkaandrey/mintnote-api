@@ -122,6 +122,6 @@ public final class NotesController {
         return noteRepository.findById(id)
                 .flatMap(note -> translationService.translate(note.getContent(), targetLanguage))
                 .map(ResponseEntity::ok)
-                .defaultIfEmpty(ResponseEntity.notFound().build());
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 }
