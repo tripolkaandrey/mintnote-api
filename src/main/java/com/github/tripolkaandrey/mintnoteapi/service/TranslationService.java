@@ -1,7 +1,7 @@
 package com.github.tripolkaandrey.mintnoteapi.service;
 
+import com.github.tripolkaandrey.mintnoteapi.exception.InvalidLanguageCodeException;
 import com.github.tripolkaandrey.mintnoteapi.exception.TranslationServiceInternalError;
-import com.github.tripolkaandrey.mintnoteapi.exception.TranslationServiceInvalidArgumentException;
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.api.gax.rpc.InvalidArgumentException;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -47,10 +47,10 @@ public final class TranslationService {
                             (StringBuilder collector, Translation translation) -> collector.append(translation.getTranslatedText()))
                     .map(StringBuilder::toString);
         } catch (InvalidArgumentException ex) {
-            return Mono.error(new TranslationServiceInvalidArgumentException());
+            return Mono.error(InvalidLanguageCodeException::new);
         } catch (IOException ex) {
             //problem occurred with translation. Most probably referred to credentials
-            return Mono.error(new TranslationServiceInternalError());
+            return Mono.error(TranslationServiceInternalError::new);
         }
     }
 }
