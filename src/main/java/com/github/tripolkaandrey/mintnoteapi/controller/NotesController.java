@@ -34,7 +34,7 @@ public final class NotesController {
     public Mono<ResponseEntity<Note>> getNote(@PathVariable String id) {
         return noteRepository.findById(id)
                 .map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PutMapping("{id}/name/")
@@ -47,7 +47,7 @@ public final class NotesController {
                             return noteRepository.save(n);
                         }
                 ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PutMapping("{id}/tags/")
@@ -60,7 +60,7 @@ public final class NotesController {
                             return noteRepository.save(n);
                         }
                 ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PutMapping("{id}/icon/")
@@ -73,7 +73,7 @@ public final class NotesController {
                             return noteRepository.save(n);
                         }
                 ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PutMapping("{id}/parent/")
@@ -86,7 +86,7 @@ public final class NotesController {
                             return noteRepository.save(n);
                         }
                 ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PutMapping("{id}/content/")
@@ -99,7 +99,7 @@ public final class NotesController {
                             return noteRepository.save(n);
                         }
                 ).map(ResponseEntity::ok)
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
     @PostMapping
@@ -113,7 +113,7 @@ public final class NotesController {
     public Mono<ResponseEntity<Void>> deleteNote(@PathVariable String id) {
         return noteRepository.findById(id)
                 .flatMap(n -> noteRepository.deleteById(id).then(Mono.just(ResponseEntity.ok().<Void>build())))
-                .switchIfEmpty(Mono.error(new NoteNotFoundException()));
+                .switchIfEmpty(Mono.error(NoteNotFoundException::new));
 
     }
 
