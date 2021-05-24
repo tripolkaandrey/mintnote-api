@@ -8,6 +8,8 @@ paths:
       tags:
         - Notes
       description: Get all notes
+      security:
+        - bearerAuth: [ ]
       operationId: getNotes
       responses:
         200:
@@ -18,10 +20,18 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
     post:
       tags:
         - Notes
       description: Create note
+      security:
+        - bearerAuth: [ ]
       operationId: createNote
       requestBody:
         content:
@@ -42,11 +52,19 @@ paths:
             text/plain:
               schema:
                 type: string
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
   /notes/{id}/:
     get:
       tags:
         - Notes
       description: Get note by id
+      security:
+        - bearerAuth: [ ]
       operationId: getNote
       parameters:
         - name: id
@@ -61,6 +79,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -71,6 +95,8 @@ paths:
       tags:
         - Notes
       description: Delete note by id
+      security:
+        - bearerAuth: [ ]
       operationId: deleteNote
       parameters:
         - name: id
@@ -85,6 +111,12 @@ paths:
             application/json:
               schema:
                 type: string
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -96,6 +128,8 @@ paths:
       tags:
         - Notes
       description: Update note's name
+      security:
+        - bearerAuth: [ ]
       operationId: updateName
       requestBody:
         content:
@@ -115,7 +149,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
-        "404":
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
+        404:
           description: Note with provided id was not found
           content:
             application/json:
@@ -126,6 +166,8 @@ paths:
       tags:
         - Notes
       description: Update note's name
+      security:
+        - bearerAuth: [ ]
       operationId: updateTags
       requestBody:
         content:
@@ -147,6 +189,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -158,6 +206,8 @@ paths:
       tags:
         - Notes
       description: Update note's icon
+      security:
+        - bearerAuth: [ ]
       operationId: updateIcon
       requestBody:
         content:
@@ -177,6 +227,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -188,6 +244,8 @@ paths:
       tags:
         - Notes
       description: Update note's parent
+      security:
+        - bearerAuth: [ ]
       operationId: updateParent
       requestBody:
         content:
@@ -207,6 +265,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -218,6 +282,8 @@ paths:
       tags:
         - Notes
       description: Update note's content
+      security:
+        - bearerAuth: [ ]
       operationId: updateContent
       requestBody:
         content:
@@ -237,6 +303,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -248,6 +320,8 @@ paths:
       tags:
         - Notes
       description: Translate note to target language
+      security:
+        - bearerAuth: [ ]
       operationId: translate
       parameters:
         - name: id
@@ -274,6 +348,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+        401:
+          description: User is not authenticated
+          content:
+            text/plain:
+              schema:
+                type: string
         404:
           description: Note with provided id was not found
           content:
@@ -287,6 +367,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiError'
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Note:
       type: object
