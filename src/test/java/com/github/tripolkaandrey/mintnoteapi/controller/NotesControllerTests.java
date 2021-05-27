@@ -231,8 +231,8 @@ class NotesControllerTests {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"name", "parent", "icon", "content"})
         @WithMockUser(username = TEST_USER_ID)
+        @ValueSource(strings = {"name", "parent", "icon", "content"})
         void Property_NotOwner_Forbidden() {
             Note testNote = createNoteInDb();
             String randomString = RandomStringUtils.randomAlphanumeric(10);
