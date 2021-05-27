@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public final class AuthenticationManager implements ReactiveAuthenticationManager {
     public AuthenticationManager(GcpProjectIdProvider gcpProjectIdProvider,
-                                 @Value("${firebase-auth-viewer-service-account}") String serviceAccount) throws IOException {
+                                 @Value("${service-account.firebase-auth-viewer}") String serviceAccount) throws IOException {
         var firebaseOptions = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(new ByteArrayInputStream(serviceAccount.getBytes())))
                 .setProjectId(gcpProjectIdProvider.getProjectId())

@@ -20,7 +20,7 @@ public final class TranslationService {
     private final TranslationServiceSettings translationServiceSettings;
 
     public TranslationService(GcpProjectIdProvider gcpProjectIdProvider,
-                              @Value("${translation-api-user-service-account}") String serviceAccount) throws IOException {
+                              @Value("${service-account.translation-api-user}") String serviceAccount) throws IOException {
         this.gcpProjectIdProvider = gcpProjectIdProvider;
         this.translationServiceSettings =
                 TranslationServiceSettings.newBuilder()

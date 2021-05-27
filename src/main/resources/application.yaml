@@ -1,0 +1,13 @@
+springdoc:
+  swagger-ui:
+    path: /swagger
+    url: /api-docs.yaml
+spring:
+  cloud:
+    gcp:
+      firestore:
+        credentials:
+          encoded-key: ${sm://firebase-admin-sdk-service-account-encoded-key}
+service-account:
+  translation-api-user: ${sm://translate-api-user-service-account}
+  firebase-auth-viewer: ${sm://firebase-auth-viewer-service-account}
