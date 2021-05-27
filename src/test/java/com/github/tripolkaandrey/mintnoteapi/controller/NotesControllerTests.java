@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
@@ -24,6 +25,8 @@ import java.util.List;
 @AutoConfigureWebTestClient
 class NotesControllerTests {
     private static final String NOTES_BASE_URL = "/notes/";
+    private static final String TEST_USER_ID = "TEST_USER_ID";
+
     @Autowired
     private WebTestClient webTestClient;
     @Autowired
@@ -35,6 +38,7 @@ class NotesControllerTests {
     }
 
     @Test
+    @WithMockUser(username = TEST_USER_ID)
     void Create_Created() {
         Note testNote = new Note();
 
@@ -52,10 +56,11 @@ class NotesControllerTests {
     @Nested
     class GetTests {
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void AllNotes_Ok() {
             final int amountOfNotes = 5;
             for (int i = 0; i < amountOfNotes; i++) {
-                noteRepository.save(new Note()).block();
+                createNoteInDb(TEST_USER_ID);
             }
 
             webTestClient.get().uri(NOTES_BASE_URL)
@@ -66,8 +71,9 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void ExistingId_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
 
             webTestClient.get().uri(NOTES_BASE_URL + testNote.getId() + "/")
                     .exchange()
@@ -80,6 +86,7 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void NotExistingId_NotFound() {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -93,8 +100,9 @@ class NotesControllerTests {
     @Nested
     class UpdateTests {
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateName_ExistingId_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
@@ -109,8 +117,9 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateIcon_ExistingId_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/icon/")
@@ -125,8 +134,9 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateParent_ExistingId_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/parent/")
@@ -141,8 +151,9 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateContent_ExistingId_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/content/")
@@ -157,6 +168,7 @@ class NotesControllerTests {
         }
 
         @ParameterizedTest
+        @WithMockUser(username = TEST_USER_ID)
         @ValueSource(strings = {"name", "parent", "icon", "content"})
         void UpdateProperty_NotExistingId_NotFound(String parameterName) {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
@@ -168,8 +180,9 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateTags_Existing_Ok() {
-            Note testNote = noteRepository.save(new Note()).block();
+            Note testNote = createNoteInDb(TEST_USER_ID);
             List<Tag> tags = new ArrayList<>();
             tags.add(new Tag("test", "test"));
 
@@ -184,6 +197,7 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void UpdateTags_NotExisting_NotFound() {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
             List<Tag> tags = new ArrayList<>();
@@ -200,8 +214,9 @@ class NotesControllerTests {
     @Nested
     class DeleteTests {
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void ExistingId_Ok() {
-            Note note = noteRepository.save(new Note()).block();
+            Note note = createNoteInDb(TEST_USER_ID);
 
             webTestClient.delete().uri(NOTES_BASE_URL + note.getId() + "/")
                     .exchange()
@@ -211,6 +226,7 @@ class NotesControllerTests {
         }
 
         @Test
+        @WithMockUser(username = TEST_USER_ID)
         void NotExistingId_NotFound() {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -219,5 +235,11 @@ class NotesControllerTests {
                     .expectStatus().isNotFound()
                     .expectBody(NoteNotFoundException.class);
         }
+    }
+
+    private Note createNoteInDb(String userId) {
+        Note note = new Note();
+        note.setUserId(userId);
+        return noteRepository.save(note).block();
     }
 }
