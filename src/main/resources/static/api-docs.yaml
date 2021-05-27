@@ -7,7 +7,7 @@ paths:
     get:
       tags:
         - Notes
-      description: Get all notes
+      summary: Get all notes
       security:
         - bearerAuth: [ ]
       operationId: getNotes
@@ -29,7 +29,7 @@ paths:
     post:
       tags:
         - Notes
-      description: Create note
+      summary: Create note
       security:
         - bearerAuth: [ ]
       operationId: createNote
@@ -68,7 +68,7 @@ paths:
     get:
       tags:
         - Notes
-      description: Get note by id
+      summary: Get note by id
       security:
         - bearerAuth: [ ]
       operationId: getNote
@@ -106,7 +106,7 @@ paths:
     delete:
       tags:
         - Notes
-      description: Delete note by id
+      summary: Delete note by id
       security:
         - bearerAuth: [ ]
       operationId: deleteNote
@@ -145,7 +145,7 @@ paths:
     put:
       tags:
         - Notes
-      description: Update note's name
+      summary: Update note's name
       security:
         - bearerAuth: [ ]
       operationId: updateName
@@ -189,7 +189,7 @@ paths:
     put:
       tags:
         - Notes
-      description: Update note's name
+      summary: Update note's name
       security:
         - bearerAuth: [ ]
       operationId: updateTags
@@ -235,7 +235,7 @@ paths:
     put:
       tags:
         - Notes
-      description: Update note's icon
+      summary: Update note's icon
       security:
         - bearerAuth: [ ]
       operationId: updateIcon
@@ -279,7 +279,7 @@ paths:
     put:
       tags:
         - Notes
-      description: Update note's parent
+      summary: Update note's parent
       security:
         - bearerAuth: [ ]
       operationId: updateParent
@@ -323,7 +323,7 @@ paths:
     put:
       tags:
         - Notes
-      description: Update note's content
+      summary: Update note's content
       security:
         - bearerAuth: [ ]
       operationId: updateContent
@@ -367,7 +367,7 @@ paths:
     get:
       tags:
         - Notes
-      description: Translate note to target language
+      summary: Translate note to target language
       security:
         - bearerAuth: [ ]
       operationId: translate
