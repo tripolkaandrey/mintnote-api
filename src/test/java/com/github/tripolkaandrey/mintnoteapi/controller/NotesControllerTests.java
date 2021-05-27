@@ -37,20 +37,34 @@ class NotesControllerTests {
         noteRepository.deleteAll().block();
     }
 
-    @Test
-    @WithMockUser(username = TEST_USER_ID)
-    void Create_Created() {
-        Note testNote = new Note();
+    @Nested
+    class CreateTests {
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void AuthenticatedUser_Created() {
+            Note testNote = new Note();
 
-        webTestClient.post().uri(NOTES_BASE_URL)
-                .body(Mono.just(testNote), Note.class)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(Note.class)
-                .consumeWith(response -> {
-                    Note responseNote = response.getResponseBody();
-                    Assertions.assertNotNull(responseNote);
-                });
+            webTestClient.post().uri(NOTES_BASE_URL)
+                    .body(Mono.just(testNote), Note.class)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(Note.class)
+                    .consumeWith(response -> {
+                        Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
+                        Assertions.assertEquals(TEST_USER_ID, responseNote.getUserId());
+                    });
+        }
+
+        @Test
+        void UnauthenticatedUser_Unauthorized() {
+            Note testNote = new Note();
+
+            webTestClient.post().uri(NOTES_BASE_URL)
+                    .body(Mono.just(testNote), Note.class)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
     }
 
     @Nested
@@ -67,12 +81,24 @@ class NotesControllerTests {
                     .exchange()
                     .expectStatus().isOk()
                     .expectBodyList(Note.class)
-                    .hasSize(amountOfNotes);
+                    .hasSize(amountOfNotes)
+                    .consumeWith(response -> {
+                        List<Note> notes = response.getResponseBody();
+                        Assertions.assertNotNull(notes);
+                        notes.forEach(n -> Assertions.assertEquals(TEST_USER_ID, n.getUserId()));
+                    });
+        }
+
+        @Test
+        void AllNotes_Unauthenticated_Unauthorized() {
+            webTestClient.get().uri(NOTES_BASE_URL)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void ExistingId_Ok() {
+        void ExistingId_Owner_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
 
             webTestClient.get().uri(NOTES_BASE_URL + testNote.getId() + "/")
@@ -81,8 +107,20 @@ class NotesControllerTests {
                     .expectBody(Note.class)
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
                         Assertions.assertEquals(testNote.getId(), responseNote.getId());
+                        Assertions.assertEquals(TEST_USER_ID, testNote.getUserId());
                     });
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void ExistingId_NotOwner_Forbidden() {
+            Note testNote = createNoteInDb();
+
+            webTestClient.get().uri(NOTES_BASE_URL + testNote.getId() + "/")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
 
         @Test
@@ -95,13 +133,22 @@ class NotesControllerTests {
                     .expectStatus().isNotFound()
                     .expectBody(NoteNotFoundException.class);
         }
+
+        @Test
+        void Unauthenticated_Unauthorized() {
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+            webTestClient.get().uri(NOTES_BASE_URL + randomString)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
     }
 
     @Nested
     class UpdateTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateName_ExistingId_Ok() {
+        void Name_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -112,13 +159,14 @@ class NotesControllerTests {
                     .expectBody(Note.class)
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
                         Assertions.assertEquals(randomString, responseNote.getName());
                     });
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateIcon_ExistingId_Ok() {
+        void Icon_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -129,13 +177,14 @@ class NotesControllerTests {
                     .expectBody(Note.class)
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
                         Assertions.assertEquals(randomString, responseNote.getIcon());
                     });
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateParent_ExistingId_Ok() {
+        void Parent_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -146,13 +195,14 @@ class NotesControllerTests {
                     .expectBody(Note.class)
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
                         Assertions.assertEquals(randomString, responseNote.getParent());
                     });
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateContent_ExistingId_Ok() {
+        void Content_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
@@ -163,6 +213,7 @@ class NotesControllerTests {
                     .expectBody(Note.class)
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
+                        Assertions.assertNotNull(responseNote);
                         Assertions.assertEquals(randomString, responseNote.getContent());
                     });
         }
@@ -170,7 +221,7 @@ class NotesControllerTests {
         @ParameterizedTest
         @WithMockUser(username = TEST_USER_ID)
         @ValueSource(strings = {"name", "parent", "icon", "content"})
-        void UpdateProperty_NotExistingId_NotFound(String parameterName) {
+        void Property_NotExistingId_NotFound(String parameterName) {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + randomString + "/" + parameterName)
@@ -179,9 +230,34 @@ class NotesControllerTests {
                     .expectBody(NoteNotFoundException.class);
         }
 
+        @ParameterizedTest
+        @ValueSource(strings = {"name", "parent", "icon", "content"})
+        @WithMockUser(username = TEST_USER_ID)
+        void Property_NotOwner_Forbidden() {
+            Note testNote = createNoteInDb();
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
+                    .body(Mono.just(randomString), String.class)
+                    .exchange()
+                    .expectStatus().isForbidden();
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"name", "parent", "icon", "content"})
+        void Property_UnauthenticatedUser_Unauthorized() {
+            Note testNote = createNoteInDb();
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
+                    .body(Mono.just(randomString), String.class)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateTags_Existing_Ok() {
+        void Tags_Ok() {
             Note testNote = createNoteInDb(TEST_USER_ID);
             List<Tag> tags = new ArrayList<>();
             tags.add(new Tag("test", "test"));
@@ -192,13 +268,27 @@ class NotesControllerTests {
                     .expectStatus().isOk()
                     .expectBody(Note.class).consumeWith(response -> {
                 Note responseNote = response.getResponseBody();
+                Assertions.assertNotNull(responseNote);
                 Assertions.assertEquals(tags, responseNote.getTags());
             });
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
-        void UpdateTags_NotExisting_NotFound() {
+        void Tags_NotOwner_Forbidden() {
+            Note testNote = createNoteInDb();
+            List<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("test", "test"));
+
+            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/tags/")
+                    .body(Mono.just(tags), List.class)
+                    .exchange()
+                    .expectStatus().isForbidden();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void Tags_NotExistingId_NotFound() {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
             List<Tag> tags = new ArrayList<>();
             tags.add(new Tag("test", "test"));
@@ -208,6 +298,18 @@ class NotesControllerTests {
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody(NoteNotFoundException.class);
+        }
+
+        @Test
+        void Tags_Unauthenticated_Unauthorized() {
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+            List<Tag> tags = new ArrayList<>();
+            tags.add(new Tag("test", "test"));
+
+            webTestClient.put().uri(NOTES_BASE_URL + randomString + "/tags")
+                    .body(Mono.just(tags), List.class)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
         }
     }
 
@@ -235,11 +337,35 @@ class NotesControllerTests {
                     .expectStatus().isNotFound()
                     .expectBody(NoteNotFoundException.class);
         }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void NotOwner_Forbidden() {
+            Note testNote = createNoteInDb();
+
+            webTestClient.delete().uri(NOTES_BASE_URL + testNote.getId() + "/")
+                    .exchange()
+                    .expectStatus().isForbidden();
+
+        }
+
+        @Test
+        void UnauthenticatedUser_Unauthorized() {
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+            webTestClient.delete().uri(NOTES_BASE_URL + randomString)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
     }
 
     private Note createNoteInDb(String userId) {
         Note note = new Note();
         note.setUserId(userId);
         return noteRepository.save(note).block();
+    }
+
+    private Note createNoteInDb() {
+        return noteRepository.save(new Note()).block();
     }
 }
