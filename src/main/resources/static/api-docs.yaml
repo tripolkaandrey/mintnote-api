@@ -58,6 +58,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
   /notes/{id}/:
     get:
       tags:
@@ -85,6 +91,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -117,6 +129,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -155,6 +173,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -195,6 +219,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -233,6 +263,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -271,6 +307,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -309,6 +351,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
@@ -343,7 +391,7 @@ paths:
               schema:
                 type: string
         400:
-          description: Error occured while translating note
+          description: Invalid language code
           content:
             application/json:
               schema:
@@ -354,6 +402,12 @@ paths:
             text/plain:
               schema:
                 type: string
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         404:
           description: Note with provided id was not found
           content:
