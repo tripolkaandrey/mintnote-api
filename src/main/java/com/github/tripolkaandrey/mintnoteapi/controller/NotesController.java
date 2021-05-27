@@ -90,6 +90,7 @@ public final class NotesController {
 
     @PostMapping
     public Mono<ResponseEntity<Note>> createNote(Principal principal, @RequestBody Note note) {
+        note.setId(null);
         note.setUserId(principal.getName());
         return noteRepository.save(note)
                 .map(n -> ResponseEntity.created(URI.create("/notes/" + n.getId())).body(n))
