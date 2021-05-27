@@ -387,7 +387,7 @@ paths:
         200:
           description: Note was successfuly translated
           content:
-            text/plain:
+            application/json:
               schema:
                 type: string
         400:
@@ -450,6 +450,9 @@ components:
           type: string
         content:
           type: string
+        userId:
+          type: string
+          readOnly: true
     Tag:
       type: object
       properties:
