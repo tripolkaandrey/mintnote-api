@@ -448,6 +448,7 @@ components:
           type: string
         id:
           type: string
+          readOnly: true
         content:
           type: string
         userId:
