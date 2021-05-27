@@ -220,13 +220,4 @@ class NotesControllerTests {
                     .expectBody(NoteNotFoundException.class);
         }
     }
-
-    @Test
-    void delete_NotExistingId_NotFound() {
-        String randomString = RandomStringUtils.randomAlphanumeric(10);
-
-        webTestClient.delete().uri("/notes/" + randomString)
-                .exchange()
-                .expectStatus().isNotFound();
-    }
 }
