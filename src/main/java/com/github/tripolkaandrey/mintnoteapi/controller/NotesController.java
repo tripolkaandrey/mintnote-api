@@ -36,13 +36,13 @@ public final class NotesController {
     @GetMapping("{id}/")
     public Mono<ResponseEntity<Note>> getNote(Principal principal, @PathVariable String id) {
         return noteRepository.findById(id)
-                .flatMap(n -> isUserAllowed(principal, n))
+                .flatMap(n -> accessFilter(principal.getName(), n))
                 .map(ResponseEntity::ok)
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
 
-    private Mono<Note> isUserAllowed(Principal principal, Note note) {
-        if (principal.getName().equals(note.getUserId())) {
+    private Mono<Note> accessFilter(String userId, Note note) {
+        if (userId.equals(note.getUserId())) {
             return Mono.just(note);
         } else {
             return Mono.error(new AccessDeniedException());
@@ -51,32 +51,32 @@ public final class NotesController {
 
     @PutMapping("{id}/name/")
     public Mono<ResponseEntity<Note>> updateName(Principal principal, @PathVariable String id, @RequestBody String name) {
-        return updateNote(principal, id, note -> note.setName(name));
+        return updateNote(principal.getName(), id, note -> note.setName(name));
     }
 
     @PutMapping("{id}/tags/")
     public Mono<ResponseEntity<Note>> updateTags(Principal principal, @PathVariable String id, @RequestBody List<Tag> tags) {
-        return updateNote(principal, id, note -> note.setTags(tags));
+        return updateNote(principal.getName(), id, note -> note.setTags(tags));
     }
 
     @PutMapping("{id}/icon/")
     public Mono<ResponseEntity<Note>> updateIcon(Principal principal, @PathVariable String id, @RequestBody String icon) {
-        return updateNote(principal, id, note -> note.setIcon(icon));
+        return updateNote(principal.getName(), id, note -> note.setIcon(icon));
     }
 
     @PutMapping("{id}/parent/")
     public Mono<ResponseEntity<Note>> updateParent(Principal principal, @PathVariable String id, @RequestBody String parent) {
-        return updateNote(principal, id, note -> note.setParent(parent));
+        return updateNote(principal.getName(), id, note -> note.setParent(parent));
     }
 
     @PutMapping("{id}/content/")
     public Mono<ResponseEntity<Note>> updateContent(Principal principal, @PathVariable String id, @RequestBody String content) {
-        return updateNote(principal, id, note -> note.setContent(content));
+        return updateNote(principal.getName(), id, note -> note.setContent(content));
     }
 
-    private Mono<ResponseEntity<Note>> updateNote(Principal principal, String id, Consumer<Note> updater) {
+    private Mono<ResponseEntity<Note>> updateNote(String userId, String id, Consumer<Note> updater) {
         return noteRepository.findById(id)
-                .flatMap(n -> isUserAllowed(principal, n))
+                .flatMap(n -> accessFilter(userId, n))
                 .flatMap(
                         n -> {
                             updater.accept(n);
@@ -100,7 +100,7 @@ public final class NotesController {
     @DeleteMapping("{id}/")
     public Mono<ResponseEntity<Void>> deleteNote(Principal principal, @PathVariable String id) {
         return noteRepository.findById(id)
-                .flatMap(n -> isUserAllowed(principal, n))
+                .flatMap(n -> accessFilter(principal.getName(), n))
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new))
                 .then(noteRepository.deleteById(id))
                 .map(ResponseEntity::ok);
@@ -109,7 +109,7 @@ public final class NotesController {
     @GetMapping("{id}/translation/{targetLanguage}/")
     public Mono<ResponseEntity<String>> translate(Principal principal, @PathVariable String id, @PathVariable String targetLanguage) {
         return noteRepository.findById(id)
-                .flatMap(n -> isUserAllowed(principal, n))
+                .flatMap(n -> accessFilter(principal.getName(), n))
                 .flatMap(n -> translationService.translate(n.getContent(), targetLanguage))
                 .map(ResponseEntity::ok)
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new));
