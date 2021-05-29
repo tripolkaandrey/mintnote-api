@@ -1,5 +1,7 @@
 package com.github.tripolkaandrey.mintnoteapi.entity;
 
+import com.google.common.base.Objects;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -70,25 +72,17 @@ public abstract class FileSystemUnit {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         FileSystemUnit that = (FileSystemUnit) o;
-
-        return name.equals(that.name) &&
-                icon.equals(that.icon) &&
-                tags.equals(that.tags) &&
-                creationDate.equals(that.creationDate) &&
-                lastModifiedDate.equals(that.lastModifiedDate) &&
-                parent.equals(that.parent);
+        return Objects.equal(name, that.name) &&
+                Objects.equal(icon, that.icon) &&
+                Objects.equal(tags, that.tags) &&
+                Objects.equal(creationDate, that.creationDate) &&
+                Objects.equal(lastModifiedDate, that.lastModifiedDate) &&
+                Objects.equal(parent, that.parent);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + icon.hashCode();
-        result = 31 * result + tags.hashCode();
-        result = 31 * result + creationDate.hashCode();
-        result = 31 * result + lastModifiedDate.hashCode();
-        result = 31 * result + parent.hashCode();
-        return result;
+        return Objects.hashCode(name, icon, tags, creationDate, lastModifiedDate, parent);
     }
 }

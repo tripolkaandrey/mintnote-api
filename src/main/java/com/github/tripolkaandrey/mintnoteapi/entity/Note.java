@@ -2,6 +2,7 @@ package com.github.tripolkaandrey.mintnoteapi.entity;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
+import com.google.common.base.Objects;
 
 @Document(collectionName = "notes")
 public final class Note extends FileSystemUnit {
@@ -39,19 +40,14 @@ public final class Note extends FileSystemUnit {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-
         Note note = (Note) o;
-
-        return id.equals(note.id) &&
-                content.equals(note.content) &&
-                userId.equals(note.userId);
+        return Objects.equal(id, note.id) &&
+                Objects.equal(content, note.content) &&
+                Objects.equal(userId, note.userId);
     }
 
     @Override
     public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + id.hashCode();
-        result = 31 * result + content.hashCode();
-        return result;
+        return Objects.hashCode(super.hashCode(), id, content, userId);
     }
 }

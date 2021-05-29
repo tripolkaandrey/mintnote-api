@@ -1,5 +1,7 @@
 package com.github.tripolkaandrey.mintnoteapi.entity;
 
+import com.google.common.base.Objects;
+
 public final class Tag {
     private String name;
     private String color;
@@ -33,16 +35,13 @@ public final class Tag {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Tag tag = (Tag) o;
-
-        return name.equals(tag.name) && color.equals(tag.color);
+        return Objects.equal(name, tag.name) &&
+                Objects.equal(color, tag.color);
     }
 
     @Override
     public int hashCode() {
-        int result = name.hashCode();
-        result = 31 * result + color.hashCode();
-        return result;
+        return Objects.hashCode(name, color);
     }
 }
