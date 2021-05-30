@@ -425,7 +425,7 @@ paths:
       tags:
         - Directories
       summary: Get contents of directory
-      description: Get contents of directory by providing full path to it. To get root do not provide any parameters
+      description: Get contents of directory by providing full path to it
       security:
         - bearerAuth: [ ]
       operationId: getDirectoryContents
@@ -436,7 +436,7 @@ paths:
           example: /first/second/third
           schema:
             type: string
-          description: full path to directory
+          description: Full path to directory. Path should match this structure "/<directory1>/<directory2>". To get root you may provide no value or "/"
       responses:
         200:
           description: Directory contents was successfuly retrieved
