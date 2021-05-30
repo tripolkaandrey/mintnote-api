@@ -8,4 +8,6 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface NoteRepository extends FirestoreReactiveRepository<Note> {
     Flux<Note> findAllByUserId(String userId);
+
+    Flux<Note> findAllByUserIdAndParent(String userId, String parent);
 }
