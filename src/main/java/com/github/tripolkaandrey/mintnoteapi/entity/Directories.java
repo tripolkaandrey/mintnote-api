@@ -9,7 +9,7 @@ import java.util.List;
 //Representation of embedded in document collection of directory entity
 @Document(collectionName = "directories")
 public final class Directories {
-    public static final Path ROOT = new Path("", "/");
+    public static final Path ROOT = Path.parse(Path.SEPARATOR);
 
     @DocumentId
     private String id;
