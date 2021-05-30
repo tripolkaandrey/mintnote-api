@@ -13,9 +13,9 @@ public final class Path {
         this.name = name;
     }
 
-    public static Path parse(String value) {
+    public static Path parse(String value) throws InvalidPathException{
         if (value == null) {
-            throw new IllegalArgumentException();
+            throw new InvalidPathException();
         }
 
         if (value.equals(SEPARATOR)) {
@@ -25,7 +25,7 @@ public final class Path {
         int lastSeparator = value.lastIndexOf(SEPARATOR);
 
         if (lastSeparator < 0) {
-            throw new IllegalArgumentException();
+            throw new InvalidPathException();
         }
 
         String name = value.substring(lastSeparator + 1);
