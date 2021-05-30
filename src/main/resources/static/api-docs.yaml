@@ -22,10 +22,6 @@ paths:
                   $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
     post:
       tags:
         - Notes
@@ -54,10 +50,6 @@ paths:
                 type: string
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -87,10 +79,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -125,10 +113,6 @@ paths:
                 type: string
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -169,10 +153,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -215,10 +195,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -259,10 +235,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -303,10 +275,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -347,10 +315,6 @@ paths:
                 $ref: '#/components/schemas/Note'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
@@ -398,10 +362,6 @@ paths:
                 $ref: '#/components/schemas/ApiError'
         401:
           description: User is not authenticated
-          content:
-            text/plain:
-              schema:
-                type: string
         403:
           description: User is not allowed to perform this action on this resource
           content:
