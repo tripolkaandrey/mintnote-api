@@ -1,5 +1,6 @@
 package com.github.tripolkaandrey.mintnoteapi.controller;
 
+import com.github.tripolkaandrey.mintnoteapi.dto.TinyType;
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.entity.Tag;
 import com.github.tripolkaandrey.mintnoteapi.exception.AccessDeniedException;
@@ -107,10 +108,11 @@ public final class NotesController {
     }
 
     @GetMapping("{id}/translation/{targetLanguage}/")
-    public Mono<ResponseEntity<String>> translate(Principal principal, @PathVariable String id, @PathVariable String targetLanguage) {
+    public Mono<ResponseEntity<TinyType<String>>> translate(Principal principal, @PathVariable String id, @PathVariable String targetLanguage) {
         return noteRepository.findById(id)
                 .flatMap(n -> accessFilter(principal.getName(), n))
                 .flatMap(n -> translationService.translate(n.getContent(), targetLanguage))
+                .map(TinyType::of)
                 .map(ResponseEntity::ok)
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new));
     }
