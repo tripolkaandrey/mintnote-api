@@ -420,6 +420,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /directories/:
+    get:
+      tags:
+        - Directories
+      summary: Get contents of directory
+      description: Get contents of directory by providing full path to it. To get root do not provide any parameters
+      security:
+        - bearerAuth: [ ]
+      operationId: getDirectoryContents
+      parameters:
+        - name: path
+          in: query
+          required: false
+          example: /first/second/third
+          schema:
+            type: string
+          description: full path to directory
+      responses:
+        200:
+          description: Directory contents was successfuly retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DirectoryContents'
+        401:
+          description: User is not authenticated
+        404:
+          description: Directory with provided path was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   securitySchemes:
     bearerAuth:
@@ -454,6 +486,36 @@ components:
         userId:
           type: string
           readOnly: true
+    Directory:
+      type: object
+      properties:
+        name:
+          type: string
+        icon:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+        creationDate:
+          type: string
+          format: date-time
+        lastModifiedDate:
+          type: string
+          format: date-time
+        parent:
+          type: string
+    DirectoryContents:
+      type: object
+      properties:
+        directories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Directory'
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
     Tag:
       type: object
       properties:
