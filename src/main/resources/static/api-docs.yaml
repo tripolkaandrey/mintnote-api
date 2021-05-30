@@ -349,7 +349,7 @@ paths:
           description: Language code supported by Google Translate API
       responses:
         200:
-          description: Note was successfuly translated
+          description: Note was successfully translated
           content:
             application/json:
               schema:
