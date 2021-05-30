@@ -15,6 +15,11 @@ public final class Directories {
     private String id;
     private List<Directory> collection;
 
+    public Directories(String id, List<Directory> collection) {
+        this.id = id;
+        this.collection = collection;
+    }
+
     public List<Directory> getCollection() {
         return collection;
     }

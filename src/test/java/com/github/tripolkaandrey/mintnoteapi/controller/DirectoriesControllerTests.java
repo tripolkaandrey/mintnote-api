@@ -41,9 +41,7 @@ class DirectoriesControllerTests {
         directory2.setParent(Directories.ROOT.toString() + directory.getName());
         directory2.setName("name2");
 
-        testDirectories = new Directories();
-        testDirectories.setCollection(List.of(directory, directory2));
-        testDirectories.setId(TEST_USER_ID);
+        testDirectories = new Directories(TEST_USER_ID, List.of(directory, directory2));
 
         testDirectories = directoriesRepository.save(testDirectories).block();
     }
