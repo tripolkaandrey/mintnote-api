@@ -444,6 +444,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DirectoryContents'
+        400:
+          description: Invalid path
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
         401:
           description: User is not authenticated
         404:
