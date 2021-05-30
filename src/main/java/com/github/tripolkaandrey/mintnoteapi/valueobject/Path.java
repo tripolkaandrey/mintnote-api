@@ -26,12 +26,12 @@ public final class Path {
 
         int lastSeparator = value.lastIndexOf(SEPARATOR);
 
-        if (lastSeparator < 0) {
+        if (lastSeparator < 0 || lastSeparator == value.length() - 1) {
             throw new InvalidPathException();
         }
 
         String name = value.substring(lastSeparator + 1);
-        String parent = value.substring(0, lastSeparator);
+        String parent = value.substring(0, lastSeparator + 1);
 
         return new Path(parent, name);
     }
