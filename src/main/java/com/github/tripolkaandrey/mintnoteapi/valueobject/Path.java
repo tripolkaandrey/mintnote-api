@@ -1,5 +1,7 @@
 package com.github.tripolkaandrey.mintnoteapi.valueobject;
 
+import com.github.tripolkaandrey.mintnoteapi.entity.Directories;
+import com.github.tripolkaandrey.mintnoteapi.exception.InvalidPathException;
 import com.google.common.base.Objects;
 
 public final class Path {
@@ -19,7 +21,7 @@ public final class Path {
         }
 
         if (value.equals(SEPARATOR)) {
-            return new Path("", "/");
+            return Directories.ROOT;
         }
 
         int lastSeparator = value.lastIndexOf(SEPARATOR);
@@ -65,6 +67,10 @@ public final class Path {
 
     @Override
     public String toString() {
-        return parent + SEPARATOR + name;
+        if (this == Directories.ROOT) {
+            return SEPARATOR;
+        } else {
+            return parent + SEPARATOR + name;
+        }
     }
 }

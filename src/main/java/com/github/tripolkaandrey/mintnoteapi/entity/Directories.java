@@ -1,5 +1,6 @@
 package com.github.tripolkaandrey.mintnoteapi.entity;
 
+import com.github.tripolkaandrey.mintnoteapi.valueobject.Path;
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
 
@@ -8,6 +9,8 @@ import java.util.List;
 //Representation of embedded in document collection of directory entity
 @Document(collectionName = "directories")
 public final class Directories {
+    public static final Path ROOT = new Path("", "/");
+
     @DocumentId
     private String id;
     private List<Directory> collection;
