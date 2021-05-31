@@ -356,7 +356,10 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  value:
+                    type: string
         400:
           description: Invalid language code
           content:
