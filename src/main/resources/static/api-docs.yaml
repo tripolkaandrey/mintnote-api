@@ -402,7 +402,7 @@ paths:
           example: /first/second/third
           schema:
             type: string
-          description: Full path to directory. Path should match this structure /directory1/directory2. To get root you may provide no value or "/"
+          description: Full path to directory. Path should match this structure /directory1/directory2 . To get root you may provide no value or "/"
       responses:
         200:
           description: Directory contents was successfuly retrieved
@@ -411,7 +411,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DirectoryContents'
         400:
-          description: Invalid path
+          description: Invalid path was provided
           content:
             application/json:
               schema:
@@ -420,6 +420,52 @@ paths:
           description: User is not authenticated
         404:
           description: Directory with provided path was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+    post:
+      tags:
+        - Directories
+      summary: Create directory
+      security:
+        - bearerAuth: [ ]
+      operationId: createDirectory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Directory'
+        required: true
+      responses:
+        201:
+          description: Directory was successfully created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Directory'
+        400:
+          description: Path to parent directory is invalid. Path should match this structure /directory1/directory2
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        401:
+          description: User is not authenticated
+        403:
+          description: User is not allowed to perform this action on this resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        404:
+          description: Parent directory does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        409:
+          description: Provided directory already exists
           content:
             application/json:
               schema:
