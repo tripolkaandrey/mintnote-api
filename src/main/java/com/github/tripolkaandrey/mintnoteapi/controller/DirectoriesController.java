@@ -29,7 +29,7 @@ public final class DirectoriesController {
     public Mono<ResponseEntity<DirectoryContents>> getDirectoryContents(Principal principal,
                                                                         @RequestParam(defaultValue = Path.SEPARATOR) String path) {
         return Mono.just(Path.parse(path))
-                .flatMap(p -> pathExistsFilter(p, principal.getName()))
+                .flatMap(p -> pathExistsFilter(principal.getName(), p))
                 .flatMapMany(p -> directoriesRepository.findAllByUserIdAndParent(principal.getName(), p.toString()))
                 .collectList()
                 .zipWith(
@@ -39,7 +39,7 @@ public final class DirectoriesController {
                 .map(ResponseEntity::ok);
     }
 
-    private Mono<Path> pathExistsFilter(Path path, String userId) {
+    private Mono<Path> pathExistsFilter(String userId, Path path) {
         return directoriesRepository.existsByUserIdAndPath(userId, path)
                 .flatMap(exists -> {
                     if (Boolean.FALSE.equals(exists)) {
