@@ -114,8 +114,8 @@ public final class NotesController {
     @DeleteMapping("{id}/")
     public Mono<ResponseEntity<Void>> deleteNote(Principal principal, @PathVariable String id) {
         return noteRepository.findById(id)
-                .flatMap(n -> accessFilter(principal.getName(), n))
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new))
+                .flatMap(n -> accessFilter(principal.getName(), n))
                 .then(noteRepository.deleteById(id))
                 .map(ResponseEntity::ok);
     }
