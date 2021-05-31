@@ -33,9 +33,15 @@ class PathTests {
         }
 
         @Test
-        void ValidInput_DoesNotThrowInvalidPathException() {
-            String randomString = RandomStringUtils.randomAlphanumeric(5) + Path.SEPARATOR + RandomStringUtils.randomAlphanumeric(5);
-            Assertions.assertDoesNotThrow(() -> Path.parse(randomString));
+        void ValidInput_DoesNotThrowInvalidPathException_ParentAndNameDetectedCorrectly() {
+            String randomParent = RandomStringUtils.randomAlphanumeric(5);
+            String randomName = RandomStringUtils.randomAlphanumeric(5);
+
+            String randomPath = randomParent + Path.SEPARATOR + randomName;
+            Assertions.assertDoesNotThrow(() -> Path.parse(randomPath));
+            Path path = Path.parse(randomPath);
+            Assertions.assertEquals(randomParent, path.getParent());
+            Assertions.assertEquals(randomName, path.getName());
         }
     }
 }
