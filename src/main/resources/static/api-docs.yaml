@@ -107,10 +107,6 @@ paths:
       responses:
         200:
           description: Note was successfuly deleted
-          content:
-            application/json:
-              schema:
-                type: string
         401:
           description: User is not authenticated
         403:
@@ -396,7 +392,7 @@ paths:
           example: /first/second/third
           schema:
             type: string
-          description: Full path to directory. Path should match this structure "/<directory1>/<directory2>". To get root you may provide no value or "/"
+          description: Full path to directory. Path should match this structure /<directory1>/<directory2>. To get root you may provide no value or "/"
       responses:
         200:
           description: Directory contents was successfuly retrieved
