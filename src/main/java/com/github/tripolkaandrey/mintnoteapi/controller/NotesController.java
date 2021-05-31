@@ -4,9 +4,12 @@ import com.github.tripolkaandrey.mintnoteapi.dto.TinyType;
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.entity.Tag;
 import com.github.tripolkaandrey.mintnoteapi.exception.AccessDeniedException;
+import com.github.tripolkaandrey.mintnoteapi.exception.DirectoryNotFoundException;
 import com.github.tripolkaandrey.mintnoteapi.exception.NoteNotFoundException;
+import com.github.tripolkaandrey.mintnoteapi.repository.DirectoriesRepository;
 import com.github.tripolkaandrey.mintnoteapi.repository.NoteRepository;
 import com.github.tripolkaandrey.mintnoteapi.service.TranslationService;
+import com.github.tripolkaandrey.mintnoteapi.valueobject.Path;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -22,10 +25,12 @@ import java.util.function.Consumer;
 @RequestMapping("/notes/")
 public final class NotesController {
     private final NoteRepository noteRepository;
+    private final DirectoriesRepository directoriesRepository;
     private final TranslationService translationService;
 
-    public NotesController(NoteRepository noteRepository, TranslationService translationService) {
+    public NotesController(NoteRepository noteRepository, DirectoriesRepository directoriesRepository, TranslationService translationService) {
         this.noteRepository = noteRepository;
+        this.directoriesRepository = directoriesRepository;
         this.translationService = translationService;
     }
 
@@ -67,6 +72,7 @@ public final class NotesController {
 
     @PutMapping("{id}/parent/")
     public Mono<ResponseEntity<Note>> updateParent(Principal principal, @PathVariable String id, @RequestBody String parent) {
+        //TODO: check for parent directory existence
         return updateNote(principal.getName(), id, note -> note.setParent(parent));
     }
 
@@ -93,9 +99,16 @@ public final class NotesController {
     public Mono<ResponseEntity<Note>> createNote(Principal principal, @RequestBody Note note) {
         note.setId(null);
         note.setUserId(principal.getName());
-        return noteRepository.save(note)
-                .map(n -> ResponseEntity.created(URI.create("/notes/" + n.getId())).body(n))
-                .defaultIfEmpty(ResponseEntity.badRequest().build());
+        return directoriesRepository
+                .existsByUserIdAndPath(principal.getName(), Path.parse(note.getParent()))
+                .flatMap(exists -> {
+                        if(Boolean.TRUE.equals(exists)) {
+                            return noteRepository.save(note)
+                                    .map(n -> ResponseEntity.created(URI.create("/notes/" + n.getId())).body(n));
+                        } else {
+                            return Mono.error(DirectoryNotFoundException::new);
+                        }
+                });
     }
 
     @DeleteMapping("{id}/")
