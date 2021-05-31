@@ -27,22 +27,26 @@ public final class DirectoriesController {
 
     @GetMapping
     public Mono<ResponseEntity<DirectoryContents>> getDirectoryContents(Principal principal,
-                                                                        @RequestParam(required = false, defaultValue = Path.SEPARATOR) String path) {
+                                                                        @RequestParam(defaultValue = Path.SEPARATOR) String path) {
         return Mono.just(Path.parse(path))
-                .flatMap(parsed -> directoriesRepository.existsByUserIdAndPath(principal.getName(), parsed))
-                .flatMapMany(exists -> {
-                    if (Boolean.TRUE.equals(exists)) {
-                        return directoriesRepository.findAllByUserId(principal.getName());
-                    } else {
-                        return Mono.error(DirectoryNotFoundException::new);
-                    }
-                })
-                .filter(x -> x.getParent().equals(path))
+                .flatMap(p -> pathExistsFilter(p, principal.getName()))
+                .flatMapMany(p -> directoriesRepository.findAllByUserIdAndParent(principal.getName(), p.toString()))
                 .collectList()
                 .zipWith(
                         noteRepository.findAllByUserIdAndParent(principal.getName(), path).collectList(),
                         DirectoryContents::new
                 )
                 .map(ResponseEntity::ok);
+    }
+
+    private Mono<Path> pathExistsFilter(Path path, String userId) {
+        return directoriesRepository.existsByUserIdAndPath(userId, path)
+                .flatMap(exists -> {
+                    if (Boolean.FALSE.equals(exists)) {
+                        return Mono.error(DirectoryNotFoundException::new);
+                    } else {
+                        return Mono.just(path);
+                    }
+                });
     }
 }
