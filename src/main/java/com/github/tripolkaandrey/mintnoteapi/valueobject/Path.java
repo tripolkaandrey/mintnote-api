@@ -31,7 +31,11 @@ public final class Path {
         }
 
         String name = value.substring(lastSeparator + 1);
-        String parent = value.substring(0, lastSeparator + 1);
+        String parent = value.substring(0, lastSeparator);
+
+        if(parent.isEmpty()) {
+            parent = Directories.ROOT.toString();
+        }
 
         return new Path(parent, name);
     }
