@@ -11,8 +11,10 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -33,13 +35,16 @@ class DirectoriesControllerTests {
 
     @BeforeEach
     public void setUpDirectories() {
-        Directory directory = new Directory();
-        directory.setParent(Directories.ROOT.toString());
-        directory.setName("name");
+        Directory directory = new Directory.Builder()
+                .withParent(Directories.ROOT.toString())
+                .withName("name")
+                .build();
 
-        Directory directory2 = new Directory();
-        directory2.setParent(Directories.ROOT.toString() + directory.getName());
-        directory2.setName("name2");
+        Directory directory2 = new Directory.Builder()
+                .withParent(Directories.ROOT.toString() + directory.getName())
+                .withName("name2")
+                .build();
+
 
         testDirectories = new Directories(TEST_USER_ID, List.of(directory, directory2));
 
@@ -52,10 +57,7 @@ class DirectoriesControllerTests {
         noteRepository.deleteAll().block();
     }
 
-    private Note createNoteInDb(String parent) {
-        Note note = new Note();
-        note.setParent(parent);
-        note.setUserId(TEST_USER_ID);
+    private Note createNoteInDb(Note note) {
         return noteRepository.save(note).block();
     }
 
@@ -64,7 +66,11 @@ class DirectoriesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void NoParams_RootContents_Ok() {
-            Note note = createNoteInDb(Directories.ROOT.toString());
+            Note note = createNoteInDb(new Note.Builder()
+                    .withUserId(TEST_USER_ID)
+                    .withParent(Directories.ROOT.toString())
+                    .build());
+
 
             webTestClient.get().uri(DIRECTORIES_BASE_URL)
                     .exchange()
@@ -82,7 +88,10 @@ class DirectoriesControllerTests {
         void Ok() {
             Directory directory2 = testDirectories.getCollection().get(1);
 
-            Note note = createNoteInDb(directory2.getParent()); //note will be in the same directory as directory2
+            Note note = createNoteInDb(new Note.Builder()
+                    .withUserId(TEST_USER_ID)
+                    .withParent(directory2.getParent())
+                    .build()); //note will be in the same directory as directory2
 
             webTestClient.get().uri(DIRECTORIES_BASE_URL + "?path=" + directory2.getParent())
                     .exchange()
