@@ -120,7 +120,7 @@ class DirectoriesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void NotExistingPath_NotFound() {
-            String randomString = RandomStringUtils.randomAlphanumeric(5) + "/" + RandomStringUtils.randomAlphanumeric(5);
+            String randomString = RandomStringUtils.randomAlphanumeric(5) + Path.SEPARATOR + RandomStringUtils.randomAlphanumeric(5);
 
             webTestClient.get().uri(DIRECTORIES_BASE_URL + "?path=" + randomString)
                     .exchange()

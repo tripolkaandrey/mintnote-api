@@ -34,7 +34,7 @@ class PathTests {
 
         @Test
         void ValidInput_DoesNotThrowInvalidPathException() {
-            String randomString = RandomStringUtils.randomAlphanumeric(5) + "/" + RandomStringUtils.randomAlphanumeric(5);
+            String randomString = RandomStringUtils.randomAlphanumeric(5) + Path.SEPARATOR + RandomStringUtils.randomAlphanumeric(5);
             Assertions.assertDoesNotThrow(() -> Path.parse(randomString));
         }
     }
