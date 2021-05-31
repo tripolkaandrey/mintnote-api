@@ -69,6 +69,8 @@ public final class Path {
     public String toString() {
         if (this == Directories.ROOT) {
             return SEPARATOR;
+        } else if (parent.equals(SEPARATOR)) {
+            return parent + name;
         } else {
             return parent + SEPARATOR + name;
         }
