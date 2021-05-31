@@ -6,6 +6,7 @@ import com.github.tripolkaandrey.mintnoteapi.entity.Directory;
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.repository.DirectoriesRepository;
 import com.github.tripolkaandrey.mintnoteapi.repository.NoteRepository;
+import com.github.tripolkaandrey.mintnoteapi.valueobject.Path;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,6 +134,82 @@ class DirectoriesControllerTests {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.get().uri(DIRECTORIES_BASE_URL + "?path=" + randomString)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
+
+    @Nested
+    class Create {
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void Created() {
+            Directory directory2 = testDirectories.getCollection().get(1);
+
+            Directory directory = new Directory.Builder()
+                    .withParent(directory2.getParent())
+                    .withName("name")
+                    .build(); //note will be in the same directory as directory2
+
+            webTestClient.post().uri(DIRECTORIES_BASE_URL)
+                    .body(Mono.just(directory), Directory.class)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(Directory.class)
+                    .consumeWith(response -> {
+                        Directory responseDirectory = response.getResponseBody();
+                        Assertions.assertEquals(directory, responseDirectory);
+                        Directories directories = directoriesRepository.findById(TEST_USER_ID).block();
+                        Assertions.assertTrue(directories.getCollection().contains(responseDirectory));
+                    });
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void NotExistingParent_NotFound() {
+            String randomString = RandomStringUtils.randomAlphanumeric(5);
+
+            Directory directory = new Directory.Builder()
+                    .withParent(Path.SEPARATOR + randomString)
+                    .withName("name")
+                    .build();
+
+            webTestClient.post().uri(DIRECTORIES_BASE_URL)
+                    .body(Mono.just(directory), Directory.class)
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void InvalidPathToParent_BadRequest() {
+            String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+            Directory directory = new Directory.Builder()
+                    .withParent(randomString)
+                    .withName("name")
+                    .build();
+
+            webTestClient.post().uri(DIRECTORIES_BASE_URL)
+                    .body(Mono.just(directory), Directory.class)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void DirectoryAlreadyExists_Conflict() {
+            Directory directory = testDirectories.getCollection().get(0);
+
+            webTestClient.post().uri(DIRECTORIES_BASE_URL)
+                    .body(Mono.just(directory), Directory.class)
+                    .exchange()
+                    .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+        }
+
+        @Test
+        void UnauthenticatedUser_Unauthorized() {
+            webTestClient.post().uri(DIRECTORIES_BASE_URL)
                     .exchange()
                     .expectStatus().isUnauthorized();
         }
