@@ -399,7 +399,7 @@ paths:
           example: /first/second/third
           schema:
             type: string
-          description: Full path to directory. Path should match this structure /<directory1>/<directory2>. To get root you may provide no value or "/"
+          description: Full path to directory. Path should match this structure /directory1/directory2. To get root you may provide no value or "/"
       responses:
         200:
           description: Directory contents was successfuly retrieved
