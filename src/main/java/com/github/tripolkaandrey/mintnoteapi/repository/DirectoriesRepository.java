@@ -14,6 +14,10 @@ public interface DirectoriesRepository extends FirestoreReactiveRepository<Direc
         return this.findById(userId).flatMapIterable(Directories::getCollection);
     }
 
+    default Flux<Directory> findAllByUserIdAndParent(String userId, String parent) {
+        return this.findAllByUserId(userId).filter(x -> x.getParent().equals(parent));
+    }
+
     default Mono<Boolean> existsByUserIdAndPath(String userId, Path path) {
         if (path.equals(Directories.ROOT)) {
             return Mono.just(true);
