@@ -42,7 +42,7 @@ class NotesControllerTests {
     }
 
     @Nested
-    class CreateTests {
+    class Create {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void AuthenticatedUser_Created() {
@@ -71,7 +71,7 @@ class NotesControllerTests {
     }
 
     @Nested
-    class GetTests {
+    class Get {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void AllNotes_Ok() {
@@ -148,7 +148,7 @@ class NotesControllerTests {
     }
 
     @Nested
-    class UpdateTests {
+    class Update {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Name_Ok() {
@@ -313,7 +313,7 @@ class NotesControllerTests {
     }
 
     @Nested
-    class DeleteTests {
+    class Delete {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void ExistingId_Ok() {
