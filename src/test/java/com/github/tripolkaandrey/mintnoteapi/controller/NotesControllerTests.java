@@ -1,8 +1,8 @@
 package com.github.tripolkaandrey.mintnoteapi.controller;
 
+import com.github.tripolkaandrey.mintnoteapi.entity.Directories;
 import com.github.tripolkaandrey.mintnoteapi.entity.Note;
 import com.github.tripolkaandrey.mintnoteapi.entity.Tag;
-import com.github.tripolkaandrey.mintnoteapi.exception.NoteNotFoundException;
 import com.github.tripolkaandrey.mintnoteapi.repository.NoteRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -37,12 +37,18 @@ class NotesControllerTests {
         noteRepository.deleteAll().block();
     }
 
+    private Note createNoteInDb(Note note) {
+        return noteRepository.save(note).block();
+    }
+
     @Nested
     class CreateTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void AuthenticatedUser_Created() {
-            Note testNote = new Note();
+            Note testNote = new Note.Builder()
+                    .withParent(Directories.ROOT.toString())
+                    .build();
 
             webTestClient.post().uri(NOTES_BASE_URL)
                     .body(Mono.just(testNote), Note.class)
@@ -58,10 +64,7 @@ class NotesControllerTests {
 
         @Test
         void UnauthenticatedUser_Unauthorized() {
-            Note testNote = new Note();
-
             webTestClient.post().uri(NOTES_BASE_URL)
-                    .body(Mono.just(testNote), Note.class)
                     .exchange()
                     .expectStatus().isUnauthorized();
         }
@@ -73,8 +76,9 @@ class NotesControllerTests {
         @WithMockUser(username = TEST_USER_ID)
         void AllNotes_Ok() {
             final int amountOfNotes = 5;
+            List<Note> testNotes = new ArrayList<>();
             for (int i = 0; i < amountOfNotes; i++) {
-                createNoteInDb(TEST_USER_ID);
+                testNotes.add(createNoteInDb((new Note.Builder().withUserId(TEST_USER_ID).build())));
             }
 
             webTestClient.get().uri(NOTES_BASE_URL)
@@ -83,9 +87,9 @@ class NotesControllerTests {
                     .expectBodyList(Note.class)
                     .hasSize(amountOfNotes)
                     .consumeWith(response -> {
-                        List<Note> notes = response.getResponseBody();
-                        Assertions.assertNotNull(notes);
-                        notes.forEach(n -> Assertions.assertEquals(TEST_USER_ID, n.getUserId()));
+                        List<Note> responseNotes = response.getResponseBody();
+                        Assertions.assertNotNull(responseNotes);
+                        Assertions.assertTrue(responseNotes.containsAll(testNotes));
                     });
         }
 
@@ -99,7 +103,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void ExistingId_Owner_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
 
             webTestClient.get().uri(NOTES_BASE_URL + testNote.getId() + "/")
                     .exchange()
@@ -108,15 +112,15 @@ class NotesControllerTests {
                     .consumeWith(response -> {
                         Note responseNote = response.getResponseBody();
                         Assertions.assertNotNull(responseNote);
-                        Assertions.assertEquals(testNote.getId(), responseNote.getId());
-                        Assertions.assertEquals(TEST_USER_ID, testNote.getUserId());
+                        Assertions.assertEquals(testNote, responseNote);
                     });
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void ExistingId_NotOwner_Forbidden() {
-            Note testNote = createNoteInDb();
+            String randomUserId = RandomStringUtils.randomAlphanumeric(10);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(randomUserId).build());
 
             webTestClient.get().uri(NOTES_BASE_URL + testNote.getId() + "/")
                     .exchange()
@@ -130,8 +134,7 @@ class NotesControllerTests {
 
             webTestClient.get().uri(NOTES_BASE_URL + randomString)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody(NoteNotFoundException.class);
+                    .expectStatus().isNotFound();
         }
 
         @Test
@@ -149,7 +152,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Name_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
@@ -167,7 +170,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Icon_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/icon/")
@@ -185,7 +188,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Parent_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/parent/")
@@ -203,7 +206,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Content_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
             webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/content/")
@@ -224,20 +227,21 @@ class NotesControllerTests {
         void Property_NotExistingId_NotFound(String parameterName) {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
-            webTestClient.put().uri(NOTES_BASE_URL + randomString + "/" + parameterName)
+            webTestClient.put().uri(NOTES_BASE_URL + randomString + "/" + parameterName + "/")
+                    .body(Mono.just(randomString), String.class)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody(NoteNotFoundException.class);
+                    .expectStatus().isNotFound();
         }
 
         @ParameterizedTest
         @WithMockUser(username = TEST_USER_ID)
         @ValueSource(strings = {"name", "parent", "icon", "content"})
-        void Property_NotOwner_Forbidden() {
-            Note testNote = createNoteInDb();
+        void Property_NotOwner_Forbidden(String parameterName) {
+            String randomUserId = RandomStringUtils.randomAlphanumeric(10);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(randomUserId).build());
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
-            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
+            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/" + parameterName + "/")
                     .body(Mono.just(randomString), String.class)
                     .exchange()
                     .expectStatus().isForbidden();
@@ -245,12 +249,10 @@ class NotesControllerTests {
 
         @ParameterizedTest
         @ValueSource(strings = {"name", "parent", "icon", "content"})
-        void Property_UnauthenticatedUser_Unauthorized() {
-            Note testNote = createNoteInDb();
+        void Property_UnauthenticatedUser_Unauthorized(String parameterName) {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
 
-            webTestClient.put().uri(NOTES_BASE_URL + testNote.getId() + "/name/")
-                    .body(Mono.just(randomString), String.class)
+            webTestClient.put().uri(NOTES_BASE_URL + randomString + "/" + parameterName)
                     .exchange()
                     .expectStatus().isUnauthorized();
         }
@@ -258,7 +260,7 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Tags_Ok() {
-            Note testNote = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
             List<Tag> tags = new ArrayList<>();
             tags.add(new Tag("test", "test"));
 
@@ -276,7 +278,8 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void Tags_NotOwner_Forbidden() {
-            Note testNote = createNoteInDb();
+            String randomUserId = RandomStringUtils.randomAlphanumeric(10);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(randomUserId).build());
             List<Tag> tags = new ArrayList<>();
             tags.add(new Tag("test", "test"));
 
@@ -296,18 +299,14 @@ class NotesControllerTests {
             webTestClient.put().uri(NOTES_BASE_URL + randomString + "/tags")
                     .body(Mono.just(tags), List.class)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody(NoteNotFoundException.class);
+                    .expectStatus().isNotFound();
         }
 
         @Test
         void Tags_Unauthenticated_Unauthorized() {
             String randomString = RandomStringUtils.randomAlphanumeric(10);
-            List<Tag> tags = new ArrayList<>();
-            tags.add(new Tag("test", "test"));
 
             webTestClient.put().uri(NOTES_BASE_URL + randomString + "/tags")
-                    .body(Mono.just(tags), List.class)
                     .exchange()
                     .expectStatus().isUnauthorized();
         }
@@ -318,13 +317,13 @@ class NotesControllerTests {
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void ExistingId_Ok() {
-            Note note = createNoteInDb(TEST_USER_ID);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(TEST_USER_ID).build());
 
-            webTestClient.delete().uri(NOTES_BASE_URL + note.getId() + "/")
+            webTestClient.delete().uri(NOTES_BASE_URL + testNote.getId() + "/")
                     .exchange()
                     .expectStatus().isOk();
 
-            Assertions.assertFalse(noteRepository.existsById(note.getId()).block());
+            Assertions.assertFalse(noteRepository.existsById(testNote.getId()).block());
         }
 
         @Test
@@ -334,19 +333,18 @@ class NotesControllerTests {
 
             webTestClient.delete().uri(NOTES_BASE_URL + randomString)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody(NoteNotFoundException.class);
+                    .expectStatus().isNotFound();
         }
 
         @Test
         @WithMockUser(username = TEST_USER_ID)
         void NotOwner_Forbidden() {
-            Note testNote = createNoteInDb();
+            String randomUserId = RandomStringUtils.randomAlphanumeric(10);
+            Note testNote = createNoteInDb(new Note.Builder().withUserId(randomUserId).build());
 
             webTestClient.delete().uri(NOTES_BASE_URL + testNote.getId() + "/")
                     .exchange()
                     .expectStatus().isForbidden();
-
         }
 
         @Test
@@ -357,15 +355,5 @@ class NotesControllerTests {
                     .exchange()
                     .expectStatus().isUnauthorized();
         }
-    }
-
-    private Note createNoteInDb(String userId) {
-        Note note = new Note();
-        note.setUserId(userId);
-        return noteRepository.save(note).block();
-    }
-
-    private Note createNoteInDb() {
-        return noteRepository.save(new Note()).block();
     }
 }
