@@ -39,4 +39,8 @@ public final class Directories {
     public void setId(String id) {
         this.id = id;
     }
+
+    public void add(Directory directory) {
+        this.collection.add(directory);
+    }
 }

@@ -33,7 +33,7 @@ public interface DirectoriesRepository extends FirestoreReactiveRepository<Direc
     default Mono<Path> add(String userId, Directory directory) {
         return this.findById(userId)
                 .flatMap(directories -> {
-                    directories.getCollection().add(directory);
+                    directories.add(directory);
                     return this.save(directories);
                 })
                 .then(Mono.just(new Path(directory.getParent(), directory.getName())));
