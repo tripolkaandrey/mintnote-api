@@ -51,7 +51,7 @@ public final class DirectoriesController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Directory>> createDirectory(Principal principal, @RequestBody Directory directory) {
+    public Mono<ResponseEntity<Directory>> create(Principal principal, @RequestBody Directory directory) {
         return Mono.just(new Path(directory.getParent(), directory.getName()))
                 .map(p -> Path.parse(p.toString()))
                 .flatMap(p -> pathNotExistFilter(principal.getName(), p))

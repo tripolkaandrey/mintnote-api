@@ -35,12 +35,12 @@ public final class NotesController {
     }
 
     @GetMapping
-    public Flux<Note> getNotes(Principal principal) {
+    public Flux<Note> getAll(Principal principal) {
         return noteRepository.findAllByUserId(principal.getName());
     }
 
     @GetMapping("{id}/")
-    public Mono<ResponseEntity<Note>> getNote(Principal principal, @PathVariable String id) {
+    public Mono<ResponseEntity<Note>> get(Principal principal, @PathVariable String id) {
         return noteRepository.findById(id)
                 .flatMap(n -> accessFilter(principal.getName(), n))
                 .map(ResponseEntity::ok)
@@ -57,31 +57,31 @@ public final class NotesController {
 
     @PutMapping("{id}/name/")
     public Mono<ResponseEntity<Note>> updateName(Principal principal, @PathVariable String id, @RequestBody String name) {
-        return updateNote(principal.getName(), id, note -> note.setName(name));
+        return updateProperty(principal.getName(), id, note -> note.setName(name));
     }
 
     @PutMapping("{id}/tags/")
     public Mono<ResponseEntity<Note>> updateTags(Principal principal, @PathVariable String id, @RequestBody List<Tag> tags) {
-        return updateNote(principal.getName(), id, note -> note.setTags(tags));
+        return updateProperty(principal.getName(), id, note -> note.setTags(tags));
     }
 
     @PutMapping("{id}/icon/")
     public Mono<ResponseEntity<Note>> updateIcon(Principal principal, @PathVariable String id, @RequestBody String icon) {
-        return updateNote(principal.getName(), id, note -> note.setIcon(icon));
+        return updateProperty(principal.getName(), id, note -> note.setIcon(icon));
     }
 
     @PutMapping("{id}/parent/")
     public Mono<ResponseEntity<Note>> updateParent(Principal principal, @PathVariable String id, @RequestBody String parent) {
         //TODO: check for parent directory existence
-        return updateNote(principal.getName(), id, note -> note.setParent(parent));
+        return updateProperty(principal.getName(), id, note -> note.setParent(parent));
     }
 
     @PutMapping("{id}/content/")
     public Mono<ResponseEntity<Note>> updateContent(Principal principal, @PathVariable String id, @RequestBody String content) {
-        return updateNote(principal.getName(), id, note -> note.setContent(content));
+        return updateProperty(principal.getName(), id, note -> note.setContent(content));
     }
 
-    private Mono<ResponseEntity<Note>> updateNote(String userId, String id, Consumer<Note> updater) {
+    private Mono<ResponseEntity<Note>> updateProperty(String userId, String id, Consumer<Note> updater) {
         return noteRepository.findById(id)
                 .flatMap(n -> accessFilter(userId, n))
                 .flatMap(
@@ -96,7 +96,7 @@ public final class NotesController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Note>> createNote(Principal principal, @RequestBody Note note) {
+    public Mono<ResponseEntity<Note>> create(Principal principal, @RequestBody Note note) {
         note.setId(null);
         note.setUserId(principal.getName());
         return directoriesRepository
@@ -112,7 +112,7 @@ public final class NotesController {
     }
 
     @DeleteMapping("{id}/")
-    public Mono<ResponseEntity<Void>> deleteNote(Principal principal, @PathVariable String id) {
+    public Mono<ResponseEntity<Void>> delete(Principal principal, @PathVariable String id) {
         return noteRepository.findById(id)
                 .switchIfEmpty(Mono.error(NoteNotFoundException::new))
                 .flatMap(n -> accessFilter(principal.getName(), n))
