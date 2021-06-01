@@ -10,7 +10,6 @@ paths:
       summary: Get all notes
       security:
         - bearerAuth: [ ]
-      operationId: getNotes
       responses:
         200:
           description: Notes were successfuly retrieved
@@ -28,7 +27,6 @@ paths:
       summary: Create note
       security:
         - bearerAuth: [ ]
-      operationId: createNote
       requestBody:
         content:
           application/json:
@@ -70,7 +68,6 @@ paths:
       summary: Get note by id
       security:
         - bearerAuth: [ ]
-      operationId: getNote
       parameters:
         - name: id
           in: path
@@ -104,7 +101,6 @@ paths:
       summary: Delete note by id
       security:
         - bearerAuth: [ ]
-      operationId: deleteNote
       parameters:
         - name: id
           in: path
@@ -135,7 +131,6 @@ paths:
       summary: Update note's name
       security:
         - bearerAuth: [ ]
-      operationId: updateName
       requestBody:
         content:
           application/json:
@@ -175,7 +170,6 @@ paths:
       summary: Update note's name
       security:
         - bearerAuth: [ ]
-      operationId: updateTags
       requestBody:
         content:
           application/json:
@@ -217,7 +211,6 @@ paths:
       summary: Update note's icon
       security:
         - bearerAuth: [ ]
-      operationId: updateIcon
       requestBody:
         content:
           application/json:
@@ -257,7 +250,6 @@ paths:
       summary: Update note's parent
       security:
         - bearerAuth: [ ]
-      operationId: updateParent
       requestBody:
         content:
           application/json:
@@ -297,7 +289,6 @@ paths:
       summary: Update note's content
       security:
         - bearerAuth: [ ]
-      operationId: updateContent
       requestBody:
         content:
           application/json:
@@ -337,7 +328,6 @@ paths:
       summary: Translate note to target language
       security:
         - bearerAuth: [ ]
-      operationId: translate
       parameters:
         - name: id
           in: path
@@ -394,7 +384,6 @@ paths:
       description: Get contents of directory by providing full path to it
       security:
         - bearerAuth: [ ]
-      operationId: getDirectoryContents
       parameters:
         - name: path
           in: query
@@ -430,7 +419,6 @@ paths:
       summary: Create directory
       security:
         - bearerAuth: [ ]
-      operationId: createDirectory
       requestBody:
         content:
           application/json:
