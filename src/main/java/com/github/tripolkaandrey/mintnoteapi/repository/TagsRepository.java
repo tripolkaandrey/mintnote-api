@@ -14,4 +14,12 @@ public interface TagsRepository extends FirestoreReactiveRepository<Tags> {
     default Mono<Boolean> exists(String userId, Tag tag) {
         return this.findById(userId).map(tags -> tags.getCollection().contains(tag));
     }
+
+    default Mono<Tag> add(String userId, Tag tag) {
+        return this.findById(userId)
+                .flatMap(tags -> {
+                    tags.add(tag);
+                    return this.save(tags).then(Mono.just(tag));
+                });
+    }
 }
