@@ -427,7 +427,7 @@ paths:
         required: true
       responses:
         201:
-          description: Directory was successfully created
+          description: Directory were successfully created
           content:
             'application/json':
               schema:
