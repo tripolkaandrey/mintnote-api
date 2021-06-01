@@ -44,4 +44,31 @@ public final class Tag {
     public int hashCode() {
         return Objects.hashCode(name, color);
     }
+
+    public static class Builder {
+        private Tag tag;
+
+        public Builder() {
+            tag = new Tag();
+        }
+
+        public Builder reset() {
+            tag = new Tag();
+            return this;
+        }
+
+        public Builder withName(String name) {
+            tag.setName(name);
+            return this;
+        }
+
+        public Builder withColor(String color) {
+            tag.setColor(color);
+            return this;
+        }
+
+        public Tag build() {
+            return tag;
+        }
+    }
 }
