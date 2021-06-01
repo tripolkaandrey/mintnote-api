@@ -476,6 +476,33 @@ paths:
                   $ref: '#/components/schemas/Tag'
         401:
           description: User is not authenticated
+    post:
+      tags:
+        - Tags
+      summary: Create tag
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tag'
+        required: true
+      responses:
+        201:
+          description: Tag was successfully created
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tag'
+        401:
+          description: User is not authenticated
+        409:
+          description: Provided tag already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 components:
   securitySchemes:
     bearerAuth:
