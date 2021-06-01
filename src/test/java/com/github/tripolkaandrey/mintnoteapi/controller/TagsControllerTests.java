@@ -74,4 +74,44 @@ class TagsControllerTests {
                     .expectStatus().isUnauthorized();
         }
     }
+
+    @Nested
+    class Create {
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void Created() {
+            String randomString = RandomStringUtils.randomAlphanumeric(5);
+            Tag testTag = new Tag.Builder()
+                    .withName(randomString)
+                    .withColor("#000000")
+                    .build();
+
+            webTestClient.post().uri(TAGS_BASE_URL)
+                    .body(Mono.just(testTag), Tag.class)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(Tag.class)
+                    .consumeWith(response -> {
+                        Tag responseTag = response.getResponseBody();
+                        Assertions.assertNotNull(responseTag);
+                        Assertions.assertEquals(testTag, responseTag);
+                    });
+        }
+
+        @Test
+        @WithMockUser(username = TEST_USER_ID)
+        void TagAlreadyExists_Conflict() {
+            webTestClient.post().uri(TAGS_BASE_URL)
+                    .body(Mono.just(testTags.getCollection().get(0)), Tag.class)
+                    .exchange()
+                    .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+        }
+
+        @Test
+        void Unauthenticated_Unauthorized() {
+            webTestClient.post().uri(TAGS_BASE_URL)
+                    .exchange()
+                    .expectStatus().isUnauthorized();
+        }
+    }
 }
